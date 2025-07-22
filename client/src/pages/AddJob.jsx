@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css"; // Import Quill CSS
 import { JobCategories, JobLocations } from "../assets/assets";
+import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 
 const AddJob = () => {
-
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("Bangalore");
   const [category, setCategory] = useState("Designing");
@@ -15,32 +15,41 @@ const AddJob = () => {
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
-  const { setJobs, jobs } = useContext(AppContext);
 
-  const onSubmitHandler = (e) => {
+  const { backendUrl, companyToken } = useContext(AppContext);
+
+  const onSubmitHandler = async (e) => {
     e.preventDefault();
-    const description = quillRef.current.root.innerHTML;
-    const newJob = {
-      _id: (jobs.length + 1).toString(),
-      title,
-      location,
-      level,
-      companyId: {
-        _id: "demo-company-id",
-        name: "Demo Company",
-        email: "demo@company.com",
-        image: "",
-      },
-      description,
-      salary,
-      date: Date.now(),
-      category,
-    };
-    setJobs([...jobs, newJob]);
-    toast.success("Job added!");
-    setTitle("");
-    setSalary(0);
-    quillRef.current.root.innerHTML = "";
+    try {
+      const description = quillRef.current.root.innerHTML;
+      // Validate description is not empty or just whitespace/HTML tags
+      const plainText = quillRef.current.getText().trim();
+      if (!plainText) {
+        toast.error("Please enter a job description.");
+        return;
+      }
+      const { data } = await axios.post(
+        backendUrl + "/api/company/post-job",
+        {
+          title,
+          description,
+          location,
+          salary,
+          category,
+          level,
+        },
+        { headers: { token: companyToken } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setTitle("");
+        setSalary(0);
+        quillRef.current.root.innerHTML = "";
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
@@ -50,10 +59,12 @@ const AddJob = () => {
       });
     }
   }, []);
-  
 
   return (
-    <form onSubmit={onSubmitHandler} className="container p-4 flex flex-col w-full items-center gap-4">
+    <form
+      onSubmit={onSubmitHandler}
+      className="container p-4 flex flex-col w-full items-center gap-4"
+    >
       {/* Job Title */}
       <div className="w-full max-w-lg">
         <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -88,6 +99,7 @@ const AddJob = () => {
           </label>
           <select
             className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
             {JobCategories.map((category, index) => (
@@ -104,6 +116,7 @@ const AddJob = () => {
           </label>
           <select
             className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            value={location}
             onChange={(e) => setLocation(e.target.value)}
           >
             {JobLocations.map((location, index) => (
@@ -120,6 +133,7 @@ const AddJob = () => {
           </label>
           <select
             className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            value={level}
             onChange={(e) => setLevel(e.target.value)}
           >
             <option value="Beginner level">Beginner level</option>
@@ -138,7 +152,7 @@ const AddJob = () => {
           className="w-full px-3 py-2 border-2 border-gray-300 rounded"
           type="number"
           placeholder="0"
-          onChange={(e) => setSalary(e.target.value)}
+          onChange={(e) => setSalary(Number(e.target.value))}
           value={salary}
         />
       </div>

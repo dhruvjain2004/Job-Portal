@@ -4,7 +4,8 @@ import { assets } from "../assets/assets";
 import moment from "moment";
 import Footer from "../components/Footer";
 import { AppContext } from "../context/AppContext";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import axios from "axios";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
 
@@ -14,10 +15,12 @@ const Applications = () => {
   const [loading, setLoading] = useState(true);
 
   const { user } = useUser();
+  const { getToken } = useAuth();
   const {
+    backendUrl,
     userData,
-    setUserData,
     userApplications,
+    fetchUserData,
     fetchUserApplications,
   } = useContext(AppContext);
 
@@ -31,18 +34,39 @@ const Applications = () => {
     }
   };
 
-  const updateResume = () => {
-    if (resume) {
-      setUserData({ ...userData, resume: resume.name });
-      toast.success("Resume uploaded!");
+  const updateResume = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("resume", resume);
+
+      const token = await getToken();
+      const { data } = await axios.post(
+        `${backendUrl}/api/users/update-resume`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        await fetchUserData();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || error.toString());
     }
+
     setIsEdit(false);
     setResume(null);
   };
 
   useEffect(() => {
     if (user) {
-      setLoading(false);
+      fetchUserApplications().finally(() => setLoading(false));
     }
   }, [user]);
 
@@ -74,6 +98,7 @@ const Applications = () => {
               <button
                 onClick={updateResume}
                 className="bg-green-100 border border-green-400 rounded-lg px-4 py-2"
+                disabled={!resume}
               >
                 Save
               </button>
@@ -84,7 +109,7 @@ const Applications = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg"
-                href={userData.resume}
+                href={userData && userData.resume ? userData.resume : "#"}
               >
                 Resume
               </a>
@@ -119,7 +144,7 @@ const Applications = () => {
               </tr>
             ) : (
               userApplications.map((job, index) => (
-                <tr key={index}>
+                <tr key={job._id || index}>
                   <td className="py-3 px-4 flex items-center gap-2 border-b">
                     {job.companyId && job.companyId.image ? (
                       <img

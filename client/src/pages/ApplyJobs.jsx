@@ -4,14 +4,15 @@ import { AppContext } from "../context/AppContext";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import JobCard from "../components/JobCard";
-import { assets, jobsData } from "../assets/assets";
+import { assets } from "../assets/assets";
 import kconvert from "k-convert";
 import moment from "moment";
 import Footer from "../components/Footer";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "@clerk/clerk-react";
 
-const ApplyJob = () => {
+const ApplyJobs = () => {
   const { id } = useParams();
   const { getToken } = useAuth();
 
@@ -19,53 +20,54 @@ const ApplyJob = () => {
   const [jobData, setJobData] = useState(null);
   const [isApplied, setIsApplied] = useState(false);
   const {
+    jobs,
+    backendUrl,
     userData,
     userApplications,
-    setUserApplications,
+    fetchUserApplications,
   } = useContext(AppContext);
 
-  // Fetch job from local jobsData array
-  const fetchJob = () => {
-    const foundJob = jobsData.find((job) => job._id === id);
-    if (foundJob) {
-      setJobData(foundJob);
-    } else {
-      toast.error("Job not found");
+  const fetchJob = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + `/api/jobs/${id}`);
+      if (data.success) {
+        setJobData(data.job);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
-  // Simulate applying for a job
-  const applyHandler = () => {
-    if (!userData || Object.keys(userData).length === 0) {
-      return toast.error("Please log in to apply for jobs.");
+  const applyHandler = async () => {
+    try {
+      if (!userData || Object.keys(userData).length === 0) {
+        return toast.error("Please log in to apply for jobs.");
+      }
+      if (!userData.resume) {
+        navigate("/applications");
+        return toast.error("Please upload your resume to apply for jobs.");
+      }
+      if (isApplied) {
+        return toast.warn("You have already applied for this job.");
+      }
+      const token = await getToken();
+      const { data } = await axios.post(
+        backendUrl + "/api/users/apply",
+        { jobId: jobData._id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        fetchUserApplications();
+        setIsApplied(true);
+      } else {
+        toast.warn(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-    if (!userData.resume) {
-      navigate("/applications");
-      return toast.error("Please upload your resume to apply for jobs.");
-    }
-    // Check if already applied
-    const alreadyApplied = userApplications.some(
-      (item) => item.jobId && item.jobId._id === jobData._id
-    );
-    if (alreadyApplied) {
-      return toast.info("You have already applied for this job.");
-    }
-    // Simulate application
-    setUserApplications([
-      ...userApplications,
-      { jobId: jobData, companyId: jobData.companyId, date: Date.now(), status: "Pending" }
-    ]);
-    setIsApplied(true);
-    toast.success("Application submitted successfully!");
-  };
-  
-
-  // Update checkAlreadyApplied to work with local state
-  const checkAlreadyApplied = () => {
-    const hasApplied = userApplications.some(
-      (item) => item.jobId && item.jobId._id === jobData._id
-    );
-    setIsApplied(hasApplied);
   };
 
   useEffect(() => {
@@ -74,11 +76,13 @@ const ApplyJob = () => {
   }, [id]);
 
   useEffect(() => {
-    if (userApplications.length > 0 && jobData) {
-      checkAlreadyApplied();
+    if (jobData && userApplications && userApplications.length > 0) {
+      const hasApplied = userApplications.some(
+        (item) => item.jobId && item.jobId._id === jobData._id
+      );
+      setIsApplied(hasApplied);
     }
-    // eslint-disable-next-line
-  }, [jobData, userApplications, id]);
+  }, [jobData, userApplications]);
 
   return jobData ? (
     <>
@@ -116,11 +120,11 @@ const ApplyJob = () => {
                 </div>
               </div>
             </div>
-
             <div className="flex flex-col items-center justify-center text-end text-sm max-md:mx-auto max-md:text-center">
               <button
                 onClick={applyHandler}
                 className="bg-blue-600 p-2.5 px-10 text-white rounded"
+                disabled={isApplied}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
               </button>
@@ -129,7 +133,6 @@ const ApplyJob = () => {
               </p>
             </div>
           </div>
-
           <div className="flex flex-col lg:flex-row justify-between items-start">
             {/* Left Section */}
             <div className="w-full lg:w-2/3">
@@ -141,25 +144,25 @@ const ApplyJob = () => {
               <button
                 onClick={applyHandler}
                 className="bg-blue-600 p-2.5 px-10 text-white rounded mt-10"
+                disabled={isApplied}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
               </button>
             </div>
-
             {/* Right Section */}
             <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
               <h2>More jobs from {jobData.companyId.name}</h2>
-              {jobsData
+              {jobs
                 .filter(
                   (job) =>
                     job._id !== jobData._id &&
                     job.companyId._id === jobData.companyId._id
                 )
                 .filter((job) => {
-                  //Set of applied jobIds
-                  const appliedJobsId = new Set(userApplications.map(app=>app.jobId && app.jobId._id))
-                  //Return true if the user has not applied for this job
-                  return !appliedJobsId.has(job._id)
+                  const appliedJobsId = new Set(
+                    userApplications.map((app) => app.jobId && app.jobId._id)
+                  );
+                  return !appliedJobsId.has(job._id);
                 })
                 .slice(0, 4)
                 .map((job, index) => (
@@ -176,4 +179,4 @@ const ApplyJob = () => {
   );
 };
 
-export default ApplyJob;
+export default ApplyJobs;

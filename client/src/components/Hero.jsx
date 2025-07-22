@@ -26,7 +26,7 @@ const Hero = () => {
           Over 10,000+ jobs to apply
         </h2>
         <p className="mb-8 max-w-xl mx-auto text-sm font-light px-5">
-          Your Next Big Carrer Move Starts Right Here - Explore the Best Job
+          Your Next Big Career Move Starts Right Here - Explore the Best Job
           Opportunities And Take FirstStep Towards Your Future!
         </p>
         <div className="flex justify-between items-center bg-white rounded text-gray-600 max-w-xl pl-4 mx-4 sm:mx-auto ">

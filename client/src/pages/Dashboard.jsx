@@ -1,14 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useFetcher, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { companyData, setCompanyData, companyToken, setCompanyToken, userData } = useContext(AppContext);
-
-  // Remove the useEffect that sets mock companyData
-
+  const { companyData, setCompanyData , companyToken, setCompanyToken } = useContext(AppContext);
+  
   //Function to logout for company
 
   const logout = ()=>{
@@ -20,14 +18,9 @@ const Dashboard = () => {
 
 
   
-  // Remove this useEffect:
-  // useEffect(()=>{
-  //   if (companyToken) {
-  //     navigate('/dashboard/manage-jobs')
-  //   }else{
-  //     navigate('/')
-  //   }
-  // },[companyToken]);
+  useEffect(() => {
+    // Remove redirect logic so dashboard is always accessible
+  }, []);
 
 
   return (
@@ -36,18 +29,18 @@ const Dashboard = () => {
       <div className="shadow py-4">
         <div className="px-5 flex justify-between items-center">
           <img
-            onClick={() => navigate("/")}
+            onClick={(e) => navigate("/")}
             className="max-sm:w-32 cursor-pointer"
             src={assets.logo}
             alt=""
           />
-          {(userData && userData.firstName) || (companyData && companyData.name) ? (
+          {companyData && (
             <div className="flex items-center gap-3">
-              <p className="max-sm:hidden">Welcome, {userData && userData.firstName ? `${userData.firstName} ${userData.lastName || ''}` : companyData.name}</p>
+              <p className="max-sm:hidden">Welcome, {companyData.name}</p>
               <div className="relative group">
                 <img
                   className="w-8 border rounded-full"
-                  src={userData && userData.imageUrl ? userData.imageUrl : (companyData && companyData.image ? companyData.image : assets.profile_img)}
+                  src={companyData.image}
                   alt=""
                 />
                 <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
@@ -57,7 +50,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
 
@@ -98,7 +91,7 @@ const Dashboard = () => {
               to={"/dashboard/view-applications"}
             >
               <img className="min-w-4" src={assets.person_tick_icon} alt="" />
-              <p className="max-sm:hidden">View Applicaitons</p>
+              <p className="max-sm:hidden">View Applications</p>
             </NavLink>
           </ul>
         </div>

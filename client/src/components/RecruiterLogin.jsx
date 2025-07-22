@@ -1,41 +1,76 @@
 import React, { useContext, useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/AppContext";
+import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const RecruiterLogin = () => {
+
   const navigate = useNavigate();
   const [state, setState] = useState("Login");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
-  const [image, setImage] = useState(false);
-  const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
-  const { setShowRecruiterLogin, setCompanyToken, setCompanyData } = useContext(AppContext);
 
-  const onSubmitHandler = (e) => {
+  const [image, setImage] = useState(false);
+
+  const [isTextDataSubmitted, setIsTextDataSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const {setShowRecruiterLogin, backendUrl, setCompanyToken, setCompanyData} = useContext(AppContext);
+
+  const onSubmitHandler = async (e)=>{
     e.preventDefault();
-    if (state === "Sign Up" && !isTextDataSubmitted) {
-      return setIsTextDataSubmitted(true);
+    if (loading) return;
+    setLoading(true);
+    if(state == "Sign Up" && !isTextDataSubmitted){
+         setLoading(false);
+         return setIsTextDataSubmitted(true);
     }
-    // Simulate login/register
-    if (state === "Login") {
-      setCompanyData({ name: email.split("@")[0], image: assets.profile_img });
-      setCompanyToken("mock-token");
-      localStorage.setItem("companyToken", "mock-token");
-      setShowRecruiterLogin(false);
-      navigate("/dashboard");
-      toast.success("Logged in as recruiter!");
-    } else {
-      setCompanyData({ name, image: image ? URL.createObjectURL(image) : assets.profile_img });
-      setCompanyToken("mock-token");
-      localStorage.setItem("companyToken", "mock-token");
-      setShowRecruiterLogin(false);
-      navigate("/dashboard");
-      toast.success("Account created!");
+    try {
+      if (state === 'Login') {
+        const {data} = await axios.post(backendUrl + '/api/company/login',{email, password})
+        if (data.success) {
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem('companyToken', data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard');
+        }
+        else{
+          toast.error(data.message);
+        }
+      }else{
+        if (!image) {
+          toast.error('Please upload a company logo.');
+          setLoading(false);
+          return;
+        }
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('password', password);
+        formData.append('email', email);
+        formData.append('image', image);
+
+        const {data} = await axios.post(backendUrl+'/api/company/register', formData)
+
+        if (data.success) {
+          setCompanyData(data.company);
+          setCompanyToken(data.token);
+          localStorage.setItem('companyToken', data.token);
+          setShowRecruiterLogin(false);
+          navigate('/dashboard');
+        }
+        else{
+          toast.error(data.message);
+        }
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  };
+    setLoading(false);
+  }
 
   useEffect(()=>{
     document.body.style.overflow ='hidden';
@@ -113,8 +148,8 @@ const RecruiterLogin = () => {
         Forgot password?
       </p>
        }
-        <button type="submit" className="bg-blue-600 w-full text-white py-2 rounded-full mt-4">
-          {state === "Login" ? "login" : isTextDataSubmitted ? "create account" : "next"}
+        <button type="submit" className="bg-blue-600 w-full text-white py-2 rounded-full mt-4" disabled={loading}>
+          {loading ? (state === "Login" ? "Logging in..." : "Creating account...") : (state === "Login" ? "login" : isTextDataSubmitted ? "create account" : "next")}
         </button>
         {state == "Login" ? (
           <p className="mt-5 text-center">

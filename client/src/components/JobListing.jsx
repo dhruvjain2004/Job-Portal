@@ -29,33 +29,35 @@ const JobListing = () => {
   };
 
   useEffect(() => {
-    const matchesCategory = (job) =>
-      selectedCategories.length === 0 || selectedCategories.includes(job.category);
-
-    const matchesLocation = (job) =>
-      selectedLocations.length === 0 || selectedLocations.includes(job.location);
-
-    const matchesTitle = (job) =>
-      searchFilter.title === "" || job.title.toLowerCase().includes(searchFilter.title.toLowerCase());
-
-    const matchesSearchLocation = (job) =>
-      searchFilter.location === "" ||
-      job.location.toLowerCase().includes(searchFilter.location.toLowerCase());
-
-    const newFilteredJobs = jobs
-      .slice()
-      .reverse()
-      .filter(
-        (job) =>
-          matchesCategory(job) &&
-          matchesLocation(job) &&
-          matchesTitle(job) &&
-          matchesSearchLocation(job)
-      );
-
-    setFilteredJobs(newFilteredJobs);
+    let filtered = jobs.slice().reverse();
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(job => selectedCategories.includes(job.category));
+    }
+    if (selectedLocations.length > 0) {
+      filtered = filtered.filter(job => selectedLocations.includes(job.location));
+    }
+    // Improved search logic
+    const titleSearch = searchFilter.title ? searchFilter.title.trim().toLowerCase() : '';
+    const locationSearch = searchFilter.location ? searchFilter.location.trim().toLowerCase() : '';
+    const companyNameSearch = searchFilter.title ? searchFilter.title.trim().toLowerCase() : '';
+    if (isSearched && (titleSearch || locationSearch)) {
+      filtered = filtered.filter(job => {
+        const titleMatch = titleSearch ? job.title.toLowerCase().includes(titleSearch) : true;
+        const locationMatch = locationSearch ? job.location.toLowerCase().includes(locationSearch) : true;
+        const companyNameMatch = companyNameSearch ? (job.companyId?.name || '').toLowerCase().includes(companyNameSearch) : true;
+        return (titleMatch || companyNameMatch) && locationMatch;
+      });
+    }
+    setFilteredJobs(filtered);
     setCurrentPage(1);
-  }, [jobs, selectedCategories, selectedLocations, searchFilter]);
+  }, [jobs, selectedCategories, selectedLocations, searchFilter, isSearched]);
+
+  // Reset filters when search is cleared
+  useEffect(() => {
+    if (!isSearched && selectedCategories.length === 0 && selectedLocations.length === 0) {
+      setFilteredJobs(jobs.slice().reverse());
+    }
+  }, [isSearched, jobs]);
 
   // Function to handle page change and scroll to job list
   const handlePageChange = (page) => {
@@ -65,6 +67,10 @@ const JobListing = () => {
       jobListRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  const jobsPerPage = 12;
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const paginatedJobs = filteredJobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
 
   return (
     <div className="container 2xl:px-20 mx-auto flex flex-col lg:flex-row  max-lg:space-y-8 py-8 ">
@@ -157,48 +163,40 @@ const JobListing = () => {
         <h3 className="font-medium text-3xl py-2">Latest Jobs</h3>
         <p className="mb-8 ">Get your desired job from top companies</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filteredJobs
-            .slice((currentPage - 1) * 6, currentPage * 6)
-            .map((job, index) => (
+          {paginatedJobs.length === 0 ? (
+            <div className="col-span-3 text-center text-gray-500 py-10">No jobs found.</div>
+          ) : (
+            paginatedJobs.map((job, index) => (
               <JobCard key={index} job={job} />
-            ))}
+            ))
+          )}
         </div>
-
-        {/* Pagination */}
-        {filteredJobs.length > 0 && (
-          <div className="flex items-center justify-center space-x-2 mt-10">
-            <a href="#job-list">
-              <img
-                onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                src={assets.left_arrow_icon}
-                alt=""
-              />
-            </a>
-            {Array.from({ length: Math.ceil(filteredJobs.length / 6) }).map((_, index) => (
-              <a key={index} href="#job-list">
-                <button
-                  onClick={() => handlePageChange(index + 1)}
-                  className={`w-10 h-10 flex items-center justify-center border border-gray-300 rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-100 text-blue-500"
-                      : "text-gray-500"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              </a>
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8 gap-2">
+            <button
+              className="px-3 py-1 border rounded disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className={`px-3 py-1 border rounded ${currentPage === i + 1 ? 'bg-blue-500 text-white' : ''}`}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </button>
             ))}
-            <a href="#job-list">
-              <img
-                onClick={() =>
-                  handlePageChange(
-                    Math.min(currentPage + 1, Math.ceil(filteredJobs.length / 6))
-                  )
-                }
-                src={assets.right_arrow_icon}
-                alt=""
-              />
-            </a>
+            <button
+              className="px-3 py-1 border rounded disabled:opacity-50"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
           </div>
         )}
       </section>

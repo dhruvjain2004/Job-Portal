@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import { manageJobsData } from "../assets/assets";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,16 +9,54 @@ import Loading from "../components/Loading";
 const ManageJobs = () => {
   const navigate = useNavigate();
 
-  const [jobs, setJobs] = useState(manageJobsData);
+  const [jobs, setJobs] = useState([]);
   const { backendUrl, companyToken } = useContext(AppContext);
 
-  // Remove fetchCompanyJobs and backend logic
-  // Remove changeJobVisiblity or make it local-only
-  const changeJobVisiblity = (id) => {
-    setJobs(jobs => jobs.map(job => job._id === id ? { ...job, visible: !job.visible } : job));
+  const fetchCompanyJobs = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/company/list-jobs", {
+        headers: { token: companyToken },
+      });
+      if (data.success) {
+        setJobs(data.jobsData); // Remove .reverse() here, already reversed in backend
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
-  // Remove useEffect
+  //Function to change job visi blity
+  const changeJobVisiblity = async (id) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/company/change-visiblity",
+        {
+          id
+        },
+        {
+          headers: { token: companyToken },
+        }
+      );
+      if(data.success){
+        toast.success(data.message);
+        fetchCompanyJobs()
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanyJobs();
+  }, []);
+
+  if (!companyToken) {
+    return <div className="flex items-center justify-center h-[70vh]"><p className="text-xl sm:text-2xl">Please log in as a recruiter to manage jobs.</p></div>;
+  }
 
   return jobs ? jobs.length === 0 ? (
   <div className="flex items-center justify-center h-[70vh]"> <p className="text-xl sm:text-2xl">No Jobs Available or Posted</p> </div>
@@ -48,15 +85,15 @@ const ManageJobs = () => {
                   <td className="py-2 px-4 border-b max-sm:hidden">
                     {index + 1}
                   </td>
-                  <td className="py-2 px-4 border-b">{job.title}</td>
+                  <td className="py-2 px-4 border-b">{job.title || "Unknown"}</td>
                   <td className="py-2 px-4 border-b max-sm:hidden">
-                    {moment(job.date).format("ll")}
+                    {job.date ? moment(job.date).format("ll") : "No Date"}
                   </td>
                   <td className="py-2 px-4 border-b max-sm:hidden">
-                    {job.location}
+                    {job.location || "Unknown"}
                   </td>
                   <td className="py-2 px-4 border-b text-center">
-                    {job.applicants}
+                    {job.applicants || 0}
                   </td>
                   <td className="py-2 px-4 border-b">
                     <input
