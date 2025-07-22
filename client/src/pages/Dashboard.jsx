@@ -1,0 +1,114 @@
+import React, { useContext, useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { assets } from "../assets/assets";
+import { AppContext } from "../context/AppContext";
+
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const { companyData, setCompanyData, companyToken, setCompanyToken, userData } = useContext(AppContext);
+
+  // Remove the useEffect that sets mock companyData
+
+  //Function to logout for company
+
+  const logout = ()=>{
+    setCompanyToken(null);
+    localStorage.removeItem('companyToken');
+    setCompanyData(null);
+    navigate('/');
+  }
+
+
+  
+  // Remove this useEffect:
+  // useEffect(()=>{
+  //   if (companyToken) {
+  //     navigate('/dashboard/manage-jobs')
+  //   }else{
+  //     navigate('/')
+  //   }
+  // },[companyToken]);
+
+
+  return (
+    <div className="min-h-screen">
+      {/* Navbar for Recruiter Panel */}
+      <div className="shadow py-4">
+        <div className="px-5 flex justify-between items-center">
+          <img
+            onClick={() => navigate("/")}
+            className="max-sm:w-32 cursor-pointer"
+            src={assets.logo}
+            alt=""
+          />
+          {(userData && userData.firstName) || (companyData && companyData.name) ? (
+            <div className="flex items-center gap-3">
+              <p className="max-sm:hidden">Welcome, {userData && userData.firstName ? `${userData.firstName} ${userData.lastName || ''}` : companyData.name}</p>
+              <div className="relative group">
+                <img
+                  className="w-8 border rounded-full"
+                  src={userData && userData.imageUrl ? userData.imageUrl : (companyData && companyData.image ? companyData.image : assets.profile_img)}
+                  alt=""
+                />
+                <div className="absolute hidden group-hover:block top-0 right-0 z-10 text-black rounded pt-12">
+                  <ul className="list-none m-0 p-2 bg-white rounded-md border text-sm">
+                    <li onClick={logout} className="py-1 px-2 cursor-pointer pr-10">Logout</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="flex items-start">
+        {/* Left side bar with option to add job, manage jobs view applications*/}
+        <div className="inline-block min-h-screen border-r-2">
+          <ul className="flex flex-col items-start pt-5 text-gray-800">
+            <NavLink
+              className={({ isActive }) =>
+                `flex items-center p-3 sm:px-6 w-full gap-2 hover:bg-gray-100 ${
+                  isActive && "bg-blue-100 border-r-4 border-blue-400"
+                }`
+              }
+              to={"/dashboard/add-job"}
+            >
+              <img className="min-w-4" src={assets.add_icon} alt="" />
+              <p className="max-sm:hidden">Add Job</p>
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                `flex items-center p-3 sm:px-6 w-full gap-2 hover:bg-gray-100 ${
+                  isActive && "bg-blue-100 border-r-4 border-blue-400"
+                }`
+              }
+              to={"/dashboard/manage-jobs"}
+            >
+              <img className="min-w-4" src={assets.home_icon} alt="" />
+              <p className="max-sm:hidden">Manage Jobs</p>
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                `flex items-center p-3 sm:px-6 w-full gap-2 hover:bg-gray-100 ${
+                  isActive && "bg-blue-100 border-r-4 border-blue-400"
+                }`
+              }
+              to={"/dashboard/view-applications"}
+            >
+              <img className="min-w-4" src={assets.person_tick_icon} alt="" />
+              <p className="max-sm:hidden">View Applicaitons</p>
+            </NavLink>
+          </ul>
+        </div>
+
+        <div className="flex-1 h-full p-2 sm:p-5">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
