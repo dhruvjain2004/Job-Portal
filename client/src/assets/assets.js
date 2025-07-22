@@ -33,7 +33,6 @@ import lock_icon from './lock_icon.svg'
 import samsung_logo from './samsung_logo.png'
 import adobe_logo from './adobe_logo.png'
 import amazon_logo from './amazon_logo.png'
-import vite_logo from "../public/vite.png";
 
 export const assets = {
     logo,
@@ -71,7 +70,7 @@ export const assets = {
     samsung_logo,
     adobe_logo,
     amazon_logo,
-    vite_logo
+    vite_logo: '/vite.png'
 }
 
 export const JobCategories = [
