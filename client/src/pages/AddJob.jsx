@@ -56,6 +56,7 @@ const AddJob = () => {
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
+        placeholder: `Enter the job description here...\n\nExample:\n<p>Job Description: Describe the role, expectations, and company culture.</p>\n<h2><strong>Key Responsibilities</strong></h2>\n<ol>\n  <li>Responsibility 1</li>\n  <li>Responsibility 2</li>\n  <li>Responsibility 3</li>\n</ol>\n<h2><strong>Skills Required</strong></h2>\n<ol>\n  <li>Skill 1</li>\n  <li>Skill 2</li>\n</ol>`
       });
     }
   }, []);
