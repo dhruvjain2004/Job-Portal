@@ -32,7 +32,9 @@ const Dashboard = () => {
             onClick={(e) => navigate("/")}
             className="max-sm:w-32 cursor-pointer"
             src={assets.logo}
-            alt=""
+            alt="NaukriVerse Logo"
+            height={40}
+            width={160}
           />
           {companyData && (
             <div className="flex items-center gap-3">
