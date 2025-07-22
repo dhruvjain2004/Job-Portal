@@ -33,8 +33,8 @@ const Dashboard = () => {
             className="max-sm:w-32 cursor-pointer"
             src={assets.logo}
             alt="NaukriVerse Logo"
-            height={40}
-            width={160}
+            height={50}
+            width={200}
           />
           {companyData && (
             <div className="flex items-center gap-3">
