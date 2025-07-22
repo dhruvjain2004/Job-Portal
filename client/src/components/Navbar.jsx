@@ -13,7 +13,10 @@ const Navbar = () => {
   return (
     <div className="shadow py-4">
       <div className="container px-4 2xl:px-20 mx-auto flex justify-between items-center">
-        <img src={assets.logo} alt="Logo" style={{ cursor: 'pointer' }} height={60} width={250} onClick={() => navigate('/')} />
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/') }>
+          <img src={assets.vite_logo} alt="NaukriVerse Symbol" height={40} width={40} />
+          <span className="font-bold text-xl ml-2">NaukriVerse</span>
+        </div>
         {user ? 
           <div className="flex items-center gap-3">
             <Link to={"/applications"}>Applied Jobs</Link>

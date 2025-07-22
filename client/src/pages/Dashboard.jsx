@@ -28,14 +28,10 @@ const Dashboard = () => {
       {/* Navbar for Recruiter Panel */}
       <div className="shadow py-4">
         <div className="px-5 flex justify-between items-center">
-          <img
-            onClick={(e) => navigate("/")}
-            className="max-sm:w-32 cursor-pointer"
-            src={assets.logo}
-            alt="NaukriVerse Logo"
-            height={60}
-            width={250}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/') }>
+            <img src={assets.vite_logo} alt="NaukriVerse Symbol" height={40} width={40} />
+            <span className="font-bold text-xl ml-2">NaukriVerse</span>
+          </div>
           {companyData && (
             <div className="flex items-center gap-3">
               <p className="max-sm:hidden">Welcome, {companyData.name}</p>
