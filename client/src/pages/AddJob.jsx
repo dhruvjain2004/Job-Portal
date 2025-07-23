@@ -56,7 +56,7 @@ const AddJob = () => {
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
-        placeholder: `Enter the job description here...\n\nExample:\n<p>Job Description: Describe the role, expectations, and company culture.</p>\n<h2><strong>Key Responsibilities</strong></h2>\n<ol>\n  <li>Responsibility 1</li>\n  <li>Responsibility 2</li>\n  <li>Responsibility 3</li>\n</ol>\n<h2><strong>Skills Required</strong></h2>\n<ol>\n  <li>Skill 1</li>\n  <li>Skill 2</li>\n</ol>`
+        placeholder: "Enter the job description here..."
       });
     }
   }, []);
@@ -64,7 +64,7 @@ const AddJob = () => {
   return (
     <form
       onSubmit={onSubmitHandler}
-      className="container p-4 flex flex-col w-full items-center gap-4"
+      className="container p-2 sm:p-4 flex flex-col w-full items-center gap-4"
     >
       {/* Job Title */}
       <div className="w-full max-w-lg">
@@ -72,7 +72,7 @@ const AddJob = () => {
           Job Title
         </label>
         <input
-          className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+          className="w-full px-3 py-2 border-2 border-gray-300 rounded text-sm"
           type="text"
           placeholder="Type here"
           onChange={(e) => setTitle(e.target.value)}
@@ -88,18 +88,23 @@ const AddJob = () => {
         </label>
         <div
           ref={editorRef}
-          className="border-2 border-gray-300 rounded p-2"
+          className="border-2 border-gray-300 rounded p-2 min-h-[120px] text-sm"
         ></div>
+        <div className="text-xs text-gray-400 mt-1">
+          Example: Describe the role, expectations, and company culture.<br/>
+          <b>Key Responsibilities:</b> <i>List main duties</i><br/>
+          <b>Skills Required:</b> <i>List required skills</i>
+        </div>
       </div>
 
       {/* Dropdown Fields */}
-      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-lg">
+      <div className="flex flex-col gap-4 w-full max-w-lg sm:flex-row sm:gap-4">
         <div className="w-full">
           <label className="block mb-2 text-sm font-medium text-gray-700">
             Job Category
           </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded text-sm"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
@@ -116,7 +121,7 @@ const AddJob = () => {
             Job Location
           </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded text-sm"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           >
@@ -133,7 +138,7 @@ const AddJob = () => {
             Job Level
           </label>
           <select
-            className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+            className="w-full px-3 py-2 border-2 border-gray-300 rounded text-sm"
             value={level}
             onChange={(e) => setLevel(e.target.value)}
           >
@@ -150,7 +155,7 @@ const AddJob = () => {
           Job Salary
         </label>
         <input
-          className="w-full px-3 py-2 border-2 border-gray-300 rounded"
+          className="w-full px-3 py-2 border-2 border-gray-300 rounded text-sm"
           type="number"
           placeholder="0"
           onChange={(e) => setSalary(Number(e.target.value))}
@@ -161,7 +166,7 @@ const AddJob = () => {
       {/* Add Button */}
       <button
         type="submit"
-        className="px-6 py-2 bg-black text-white font-medium rounded"
+        className="px-6 py-2 bg-black text-white font-medium rounded w-full max-w-lg text-center"
       >
         ADD
       </button>

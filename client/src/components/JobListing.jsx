@@ -73,17 +73,17 @@ const JobListing = () => {
   const paginatedJobs = filteredJobs.slice((currentPage - 1) * jobsPerPage, currentPage * jobsPerPage);
 
   return (
-    <div className="container 2xl:px-20 mx-auto flex flex-col lg:flex-row  max-lg:space-y-8 py-8 ">
+    <div className="container 2xl:px-20 mx-auto flex flex-col lg:flex-row max-lg:space-y-8 py-4 sm:py-8 ">
       {/* Side bar */}
-      <div className="w-full lg:w-1/4 p-4 bg-white">
+      <div className="w-full lg:w-1/4 p-2 sm:p-4 bg-white">
         {/* Search Filter from Hero Component */}
         {isSearched &&
           (searchFilter.title !== "" || searchFilter.location !== "") && (
             <>
-              <h3 className="font-medium text-lg mb-4">Current Search</h3>
-              <div className="mb-4 text-gray-600">
+              <h3 className="font-medium text-base sm:text-lg mb-4">Current Search</h3>
+              <div className="mb-4 text-gray-600 text-xs sm:text-base">
                 {searchFilter.title && (
-                  <span className="inline-flex items-center gap-2.5 bg-blue-50 border border-blue-200 px-4 py-1.5 rounded">
+                  <span className="inline-flex items-center gap-2.5 bg-blue-50 border border-blue-200 px-2 sm:px-4 py-1.5 rounded">
                     {searchFilter.title}
                     <img
                       onClick={() =>
@@ -97,7 +97,7 @@ const JobListing = () => {
                 )}
 
                 {searchFilter.location && (
-                  <span className="ml-2 inline-flex items-center gap-2.5 bg-red-50 border border-red-200 px-4 py-1.5 rounded">
+                  <span className="ml-2 inline-flex items-center gap-2.5 bg-red-50 border border-red-200 px-2 sm:px-4 py-1.5 rounded">
                     {searchFilter.location}
                     <img
                       onClick={() =>
@@ -116,20 +116,20 @@ const JobListing = () => {
         {/* filter button */}
         <button
           onClick={() => setShowFilter((prev) => !prev)}
-          className="px-6 py-1.5 rounded border border-gray-400 lg:hidden "
+          className="px-6 py-1.5 rounded border border-gray-400 lg:hidden mb-2 text-xs"
         >
           {showFilter ? "Close" : "Filters"}
         </button>
 
         {/* Category Filter */}
         <div className={showFilter ? " " : "max-lg:hidden"}>
-          <h4 className="font-medium text-lg py-4">Search by Categories</h4>
-          <ul className="space-y-4 text-gray-600">
+          <h4 className="font-medium text-base sm:text-lg py-4">Search by Categories</h4>
+          <ul className="space-y-2 sm:space-y-4 text-gray-600 text-xs sm:text-base">
             {JobCategories.map((category, index) => (
               <li className="flex gap-3 items-center" key={index}>
                 <input
                   onChange={() => handleCategoryChange(category)}
-                  className="scale-125 accent-blue-500"
+                  className="scale-110 sm:scale-125 accent-blue-500"
                   type="checkbox"
                   checked={selectedCategories.includes(category)}
                 />
@@ -141,12 +141,12 @@ const JobListing = () => {
 
         {/* Location Flter */}
         <div className={showFilter ? " " : "max-lg:hidden"}>
-          <h4 className="font-medium text-lg py-4 pt-14">Search by Location</h4>
-          <ul className="space-y-4 text-gray-600">
+          <h4 className="font-medium text-base sm:text-lg py-4 pt-8 sm:pt-14">Search by Location</h4>
+          <ul className="space-y-2 sm:space-y-4 text-gray-600 text-xs sm:text-base">
             {JobLocations.map((location, index) => (
               <li className="flex gap-3 items-center" key={index}>
                 <input
-                  className="scale-125 accent-blue-500"
+                  className="scale-110 sm:scale-125 accent-blue-500"
                   type="checkbox"
                   onChange={() => handleLocationChange(location)}
                   checked={selectedLocations.includes(location)}
@@ -159,10 +159,10 @@ const JobListing = () => {
       </div>
 
       {/* Job Listings */}
-      <section ref={jobListRef} className="w-full lg:w-3/4 text-gray-800 max-lg:px-4">
-        <h3 className="font-medium text-3xl py-2">Latest Jobs</h3>
-        <p className="mb-8 ">Get your desired job from top companies</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <section ref={jobListRef} className="w-full lg:w-3/4 text-gray-800 max-lg:px-2 sm:max-lg:px-4">
+        <h3 className="font-medium text-2xl sm:text-3xl py-2">Latest Jobs</h3>
+        <p className="mb-4 sm:mb-8 text-xs sm:text-base">Get your desired job from top companies</p>
+        <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
           {paginatedJobs.length === 0 ? (
             <div className="col-span-3 text-center text-gray-500 py-10">No jobs found.</div>
           ) : (

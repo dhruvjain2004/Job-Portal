@@ -87,20 +87,20 @@ const ApplyJobs = () => {
   return jobData ? (
     <>
       <Navbar />
-      <div className="min-h-screen flex flex-col py-10 container px-4 2xl:px-20 mx-auto">
+      <div className="min-h-screen flex flex-col py-4 sm:py-10 container px-2 sm:px-4 2xl:px-20 mx-auto">
         <div className="bg-white text-black rounded-lg w-full">
-          <div className="flex justify-center md:justify-between flex-wrap gap-8 px-14 py-20 mb-6 bg-sky-50 border border-sky-400 rounded-xl">
-            <div className="flex flex-col md:flex-row items-center">
+          <div className="flex flex-col md:flex-row justify-center md:justify-between flex-wrap gap-4 md:gap-8 px-2 sm:px-6 md:px-14 py-6 sm:py-10 md:py-20 mb-6 bg-sky-50 border border-sky-400 rounded-xl">
+            <div className="flex flex-col md:flex-row items-center w-full md:w-auto">
               <img
-                className="h-24 bg-white rounded-lg p-4 mr-4 max-md:mb-4 border "
+                className="h-20 sm:h-24 bg-white rounded-lg p-2 sm:p-4 mr-0 md:mr-4 mb-4 md:mb-0 border "
                 src={jobData.companyId.image}
                 alt=""
               />
               <div className="text-center md:text-left text-neutral-700 ">
-                <h1 className="text-2xl sm:text-4xl font-medium">
+                <h1 className="text-lg sm:text-2xl md:text-4xl font-medium">
                   {jobData.title}
                 </h1>
-                <div className="flex flex-row flex-wrap max-md:justify-center gap-y-2 items-center text-gray-600 mt-3 gap-6">
+                <div className="flex flex-row flex-wrap max-md:justify-center gap-y-2 items-center text-gray-600 mt-3 gap-4 sm:gap-6 text-xs sm:text-base">
                   <span className="flex items-center gap-2">
                     <img src={assets.suitcase_icon} alt="" />
                     {jobData.companyId.name}
@@ -120,10 +120,10 @@ const ApplyJobs = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center text-end text-sm max-md:mx-auto max-md:text-center">
+            <div className="flex flex-col items-center justify-center text-end text-xs sm:text-sm w-full md:w-auto max-md:mx-auto max-md:text-center">
               <button
                 onClick={applyHandler}
-                className="bg-blue-600 p-2.5 px-10 text-white rounded"
+                className="bg-blue-600 p-2.5 px-8 sm:px-10 text-white rounded w-full sm:w-auto"
                 disabled={isApplied}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
@@ -133,17 +133,17 @@ const ApplyJobs = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col lg:flex-row justify-between items-start">
+          <div className="flex flex-col lg:flex-row justify-between items-start gap-8">
             {/* Left Section */}
             <div className="w-full lg:w-2/3">
-              <h2 className="font-bold text-2xl mb-4">Job description</h2>
+              <h2 className="font-bold text-lg sm:text-2xl mb-4">Job description</h2>
               <div
-                className="rich-text"
+                className="rich-text text-xs sm:text-base"
                 dangerouslySetInnerHTML={{ __html: jobData.description }}
               ></div>
               <button
                 onClick={applyHandler}
-                className="bg-blue-600 p-2.5 px-10 text-white rounded mt-10"
+                className="bg-blue-600 p-2.5 px-8 sm:px-10 text-white rounded mt-6 sm:mt-10 w-full sm:w-auto"
                 disabled={isApplied}
               >
                 {isApplied ? "Already Applied" : "Apply Now"}
@@ -151,7 +151,7 @@ const ApplyJobs = () => {
             </div>
             {/* Right Section */}
             <div className="w-full lg:w-1/3 mt-8 lg:mt-0 lg:ml-8 space-y-5">
-              <h2>More jobs from {jobData.companyId.name}</h2>
+              <h2 className="text-base sm:text-lg">More jobs from {jobData.companyId.name}</h2>
               {jobs
                 .filter(
                   (job) =>
