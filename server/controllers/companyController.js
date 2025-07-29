@@ -98,12 +98,14 @@ export const getCompanyData = async (req, res) => {
 
 //Post a new job
 export const postJob = async (req, res) => {
-  const { title, description, location, salary, level, category } = req.body;
+  const { title, description, keyResponsibilities, skillsRequired, location, salary, level, category } = req.body;
   const companyId = req.company._id;
   try {
     const newJob = new Job({
       title,
       description,
+      keyResponsibilities: Array.isArray(keyResponsibilities) ? keyResponsibilities : [keyResponsibilities],
+      skillsRequired: Array.isArray(skillsRequired) ? skillsRequired : [skillsRequired],
       location,
       salary,
       companyId,

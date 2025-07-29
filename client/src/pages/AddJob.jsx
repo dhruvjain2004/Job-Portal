@@ -12,11 +12,43 @@ const AddJob = () => {
   const [category, setCategory] = useState("Designing");
   const [level, setLevel] = useState("Beginner level");
   const [salary, setSalary] = useState(0);
+  const [keyResponsibilities, setKeyResponsibilities] = useState([""]);
+  const [skillsRequired, setSkillsRequired] = useState([""]);
 
   const editorRef = useRef(null);
   const quillRef = useRef(null);
 
   const { backendUrl, companyToken } = useContext(AppContext);
+
+  const addResponsibility = () => {
+    setKeyResponsibilities([...keyResponsibilities, ""]);
+  };
+
+  const removeResponsibility = (index) => {
+    const newResponsibilities = keyResponsibilities.filter((_, i) => i !== index);
+    setKeyResponsibilities(newResponsibilities);
+  };
+
+  const updateResponsibility = (index, value) => {
+    const newResponsibilities = [...keyResponsibilities];
+    newResponsibilities[index] = value;
+    setKeyResponsibilities(newResponsibilities);
+  };
+
+  const addSkill = () => {
+    setSkillsRequired([...skillsRequired, ""]);
+  };
+
+  const removeSkill = (index) => {
+    const newSkills = skillsRequired.filter((_, i) => i !== index);
+    setSkillsRequired(newSkills);
+  };
+
+  const updateSkill = (index, value) => {
+    const newSkills = [...skillsRequired];
+    newSkills[index] = value;
+    setSkillsRequired(newSkills);
+  };
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -28,11 +60,28 @@ const AddJob = () => {
         toast.error("Please enter a job description.");
         return;
       }
+
+      // Filter out empty responsibilities and skills
+      const filteredResponsibilities = keyResponsibilities.filter(resp => resp.trim() !== "");
+      const filteredSkills = skillsRequired.filter(skill => skill.trim() !== "");
+
+      if (filteredResponsibilities.length === 0) {
+        toast.error("Please add at least one key responsibility.");
+        return;
+      }
+
+      if (filteredSkills.length === 0) {
+        toast.error("Please add at least one required skill.");
+        return;
+      }
+
       const { data } = await axios.post(
         backendUrl + "/api/company/post-job",
         {
           title,
           description,
+          keyResponsibilities: filteredResponsibilities,
+          skillsRequired: filteredSkills,
           location,
           salary,
           category,
@@ -45,6 +94,8 @@ const AddJob = () => {
         toast.success(data.message);
         setTitle("");
         setSalary(0);
+        setKeyResponsibilities([""]);
+        setSkillsRequired([""]);
         quillRef.current.root.innerHTML = "";
       }
     } catch (error) {
@@ -91,10 +142,76 @@ const AddJob = () => {
           className="border-2 border-gray-300 rounded p-2 min-h-[120px] text-sm"
         ></div>
         <div className="text-xs text-gray-400 mt-1">
-          Example: Describe the role, expectations, and company culture.<br/>
-          <b>Key Responsibilities:</b> <i>List main duties</i><br/>
-          <b>Skills Required:</b> <i>List required skills</i>
+          Describe the role, expectations, and company culture.
         </div>
+      </div>
+
+      {/* Key Responsibilities */}
+      <div className="w-full max-w-lg">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
+          Key Responsibilities
+        </label>
+        {keyResponsibilities.map((responsibility, index) => (
+          <div key={index} className="flex gap-2 mb-2">
+            <input
+              className="flex-1 px-3 py-2 border-2 border-gray-300 rounded text-sm"
+              type="text"
+              placeholder="Enter responsibility"
+              value={responsibility}
+              onChange={(e) => updateResponsibility(index, e.target.value)}
+            />
+            {keyResponsibilities.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeResponsibility(index)}
+                className="px-3 py-2 bg-red-500 text-white rounded text-sm"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addResponsibility}
+          className="px-4 py-2 bg-green-500 text-white rounded text-sm"
+        >
+          Add Responsibility
+        </button>
+      </div>
+
+      {/* Skills Required */}
+      <div className="w-full max-w-lg">
+        <label className="block mb-2 text-sm font-medium text-gray-700">
+          Skills Required
+        </label>
+        {skillsRequired.map((skill, index) => (
+          <div key={index} className="flex gap-2 mb-2">
+            <input
+              className="flex-1 px-3 py-2 border-2 border-gray-300 rounded text-sm"
+              type="text"
+              placeholder="Enter skill"
+              value={skill}
+              onChange={(e) => updateSkill(index, e.target.value)}
+            />
+            {skillsRequired.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeSkill(index)}
+                className="px-3 py-2 bg-red-500 text-white rounded text-sm"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addSkill}
+          className="px-4 py-2 bg-green-500 text-white rounded text-sm"
+        >
+          Add Skill
+        </button>
       </div>
 
       {/* Dropdown Fields */}

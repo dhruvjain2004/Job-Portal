@@ -141,6 +141,36 @@ const ApplyJobs = () => {
                 className="rich-text text-xs sm:text-base"
                 dangerouslySetInnerHTML={{ __html: jobData.description }}
               ></div>
+
+              {/* Key Responsibilities */}
+              {jobData.keyResponsibilities && jobData.keyResponsibilities.length > 0 && (
+                <div className="mt-6 sm:mt-8">
+                  <h3 className="font-bold text-lg sm:text-xl mb-3 text-gray-800">Key Responsibilities</h3>
+                  <ul className="space-y-2 text-sm sm:text-base">
+                    {jobData.keyResponsibilities.map((responsibility, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-blue-500 mr-2 mt-1">•</span>
+                        <span className="text-gray-700">{responsibility}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Skills Required */}
+              {jobData.skillsRequired && jobData.skillsRequired.length > 0 && (
+                <div className="mt-6 sm:mt-8">
+                  <h3 className="font-bold text-lg sm:text-xl mb-3 text-gray-800">Skills Required</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {jobData.skillsRequired.map((skill, index) => (
+                      <span key={index} className="bg-green-50 border border-green-200 px-3 py-2 rounded-lg text-sm text-green-700 font-medium">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={applyHandler}
                 className="bg-blue-600 p-2.5 px-8 sm:px-10 text-white rounded mt-6 sm:mt-10 w-full sm:w-auto"
