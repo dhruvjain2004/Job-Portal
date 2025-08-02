@@ -4,7 +4,7 @@ import Company from './models/Company.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const MONGO_URL = process.env.MONGO_URL || 'mongodb+srv://dhruvjain527:dhruvjain2004@jobportal-cluster.kihmw28.mongodb.net';
+const MONGO_URL = process.env.MONGO_URL || 'mongodb+srv://<username>:<password>@jobportal-cluster.kihmw28.mongodb.net';
 
 const demoCompanies = [
   {
